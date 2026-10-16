@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Well Do You Know Me? ♡</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:linear-gradient(145deg,#fff0f5,#f8e8ff,#fff7fb);
+  color:#513647;display:grid;place-items:center;
+  padding:20px
+}
+.card{
+  width:100%;max-width:440px;background:#ffffffd9;
+  border:1px solid #fff;border-radius:28px;
+  padding:28px 22px;box-shadow:0 15px 50px #a95a8020;
+  text-align:center
+}
+.heart{font-size:35px}
+h1{font-size:28px;margin:10px 0}
+p{line-height:1.6}
+.tag{color:#b65c83;font-size:13px;letter-spacing:2px}
+#progress{font-size:13px;color:#a16d85;margin:22px 0 10px}
+#question{font-size:20px;line-height:1.4}
+.answers{display:grid;gap:10px;margin-top:22px}
+button{
+  font:inherit;cursor:pointer;border-radius:15px;
+  padding:14px;border:1px solid #f0c9dc;
+  background:white;color:#654254;transition:.15s
+}
+button:hover{background:#fff0f6}
+button:disabled{cursor:default;opacity:.8}
+button.correct{background:#e5f6e9;border-color:#86c99a}
+button.wrong{background:#ffe6eb;border-color:#e9a0b1}
+.primary{background:#d96e9b;color:white;border:0;width:100%;margin-top:20px}
+.primary:hover{background:#c85d8a}
+#feedback{font-weight:600;min-height:24px;margin-top:16px}
+.small{font-size:12px;color:#a17b8d;margin-top:22px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main class="card">
+  <section id="welcome">
+    <div class="heart">♡</div>
+    <div class="tag">A LITTLE GAME ABOUT ME</div>
+    <h1>How well do you know me?</h1>
+    <p>Think you know me? 💗<br>
+    Answer these questions and find out!</p>
+    <button class="primary" onclick="startQuiz()">Let's play ✨</button>
+  </section>
+
+  <section id="game" class="hidden">
+    <div class="heart">♡</div>
+    <div id="progress"></div>
+    <h2 id="question"></h2>
+    <div id="answers" class="answers"></div>
+    <div id="feedback"></div>
+    <button id="next" class="primary hidden" onclick="nextQuestion()">Next →</button>
+  </section>
+
+  <section id="result" class="hidden">
+    <div class="heart">💗</div>
+    <div class="tag">YOUR RESULT</div>
+    <h1 id="score"></h1>
+    <p id="message"></p>
+    <button class="primary" onclick="restart()">Play again ↻</button>
+    <p class="small">Made with ♡</p>
+  </section>
+</main>
+
+<script>
+// Change these sample questions and answers to match you!
+const questions = [
+  {
+    q:"What is my favorite color?",
+    a:["Pink","Black","Blue","Purple"],
+    correct:0
+  },
+  {
+    q:"What do I enjoy most?",
+    a:["Listening to music","Sleeping","Reading","Travelling"],
+    correct:0
+  },
+  {
+    q:"What describes my personality best?",
+    a:["Shy","Funny","Adventurous","A little bit of everything"],
+    correct:3
+  },
+  {
+    q:"What is one of my biggest dreams?",
+    a:["To travel the world","To be successful","To learn new things","All of these"],
+    correct:3
+  },
+  {
+    q:"How well do you think you know me?",
+    a:["Very well","A little","I'm still discovering you","That's a secret 😉"],
+    correct:0
+  }
+];
+
+let index=0, points=0, answered=false;
+
+function startQuiz(){
+  index=0;points=0;
+  document.getElementById("welcome").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+  showQuestion();
+}
+function showQuestion(){
+  answered=false;
+  const item=questions[index];
+  document.getElementById("progress").textContent=
+    `QUESTION ${index+1} OF ${questions.length}`;
+  document.getElementById("question").textContent=item.q;
+  document.getElementById("feedback").textContent="";
+  document.getElementById("next").classList.add("hidden");
+  const box=document.getElementById("answers");
+  box.innerHTML="";
+  item.a.forEach((answer,i)=>{
+    const btn=document.createElement("button");
+    btn.textContent=answer;
+    btn.onclick=()=>chooseAnswer(i,btn);
+    box.appendChild(btn);
+  });
+}
+function chooseAnswer(choice,button){
+  if(answered)return;
+  answered=true;
+  const item=questions[index];
+  const buttons=document.querySelectorAll("#answers button");
+  buttons.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===item.correct)b.classList.add("correct");
+  });
+  if(choice===item.correct){
+    points++;
+    document.getElementById("feedback").textContent="You got it right! ♡";
+  }else{
+    button.classList.add("wrong");
+    document.getElementById("feedback").textContent="Not quite! Keep going 💗";
+  }
+  const next=document.getElementById("next");
+  next.textContent=index===questions.length-1?"See my result ♡":"Next →";
+  next.classList.remove("hidden");
+}
+function nextQuestion(){
+  index++;
+  if(index<questions.length){showQuestion();return;}
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("score").textContent=
+    `${points} / ${questions.length}`;
+  const ratio=points/questions.length;
+  document.getElementById("message").textContent=
+    ratio===1?"Wow! You know me so well! 🥹💗":
+    ratio>=.6?"You know me pretty well! ✨":
+    ratio>=.4?"There's still more to discover about me! ♡":
+    "Looks like we have more to learn about each other! 💌";
+}
+function restart(){
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("welcome").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
